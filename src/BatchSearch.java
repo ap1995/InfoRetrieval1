@@ -1,8 +1,8 @@
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Paths;
 import java.util.HashMap;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -17,7 +17,6 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.similarities.*;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.util.Version;
 
 /** Simple command-line based search demo. */
 public class BatchSearch {
@@ -56,9 +55,7 @@ public class BatchSearch {
 		}
 
 		Similarity simfn = null;
-		if ("default".equals(simstring)) {
-			simfn = new DefaultSimilarity();
-		} else if ("bm25".equals(simstring)) {
+		if ("bm25".equals(simstring)) {
 			simfn = new BM25Similarity();
 		} else if ("dfr".equals(simstring)) {
 			simfn = new DFRSimilarity(new BasicModelP(), new AfterEffectL(), new NormalizationH2());
@@ -74,10 +71,10 @@ public class BatchSearch {
 			System.exit(0);
 		}
 		
-		IndexReader reader = DirectoryReader.open(FSDirectory.open(new File(index)));
+		IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(index)));
 		IndexSearcher searcher = new IndexSearcher(reader);
 		searcher.setSimilarity(simfn);
-		Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_41);
+		Analyzer analyzer = new StandardAnalyzer();
 		
 		BufferedReader in = null;
 		if (queries != null) {
@@ -85,7 +82,7 @@ public class BatchSearch {
 		} else {
 			in = new BufferedReader(new InputStreamReader(new FileInputStream("queries"), "UTF-8"));
 		}
-		QueryParser parser = new QueryParser(Version.LUCENE_41, field, analyzer);
+		QueryParser parser = new QueryParser(field, analyzer);
 		while (true) {
 			String line = in.readLine();
 
@@ -116,10 +113,10 @@ public class BatchSearch {
 		TopDocs results = searcher.search(query, 1000);
 		ScoreDoc[] hits = results.scoreDocs;
 		HashMap<String, String> seen = new HashMap<String, String>(1000);
-		int numTotalHits = results.totalHits;
+		long numTotalHits = results.totalHits;
 		
 		int start = 0;
-		int end = Math.min(numTotalHits, 1000);
+		long end = Math.min(numTotalHits, 1000);
 
 		for (int i = start; i < end; i++) {
 			Document doc = searcher.doc(hits[i].doc);

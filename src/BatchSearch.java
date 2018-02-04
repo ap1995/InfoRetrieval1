@@ -55,7 +55,9 @@ public class BatchSearch {
 		}
 
 		Similarity simfn = null;
-		if ("bm25".equals(simstring)) {
+		if ("default".equals(simstring)) {
+			simfn = new ClassicSimilarity();
+		} else if ("bm25".equals(simstring)) {
 			simfn = new BM25Similarity();
 		} else if ("dfr".equals(simstring)) {
 			simfn = new DFRSimilarity(new BasicModelP(), new AfterEffectL(), new NormalizationH2());

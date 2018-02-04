@@ -3,7 +3,8 @@ data = []
 
 if len(sys.argv) < 3:
     print("Pass input and output file names")
-    return
+    exit()
+    
 inFile = sys.argv[1]
 outFile = sys.argv[2]
 with open(inFile) as f:

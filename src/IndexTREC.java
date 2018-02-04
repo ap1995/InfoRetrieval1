@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Date;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -52,9 +53,9 @@ public class IndexTREC {
 		try {
 			System.out.println("Indexing to directory '" + indexPath + "'...");
 
-			Directory dir = FSDirectory.open(new File(indexPath));
-			Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_41);
-			IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_41, analyzer);
+			Directory dir = FSDirectory.open(Paths.get(indexPath));
+			Analyzer analyzer = new StandardAnalyzer();
+			IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
 
 			if (create) {
 				// Create a new index in the directory, removing any

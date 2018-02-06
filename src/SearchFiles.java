@@ -85,6 +85,8 @@ public class SearchFiles {
             in = new BufferedReader(new InputStreamReader(System.in, "UTF-8"));
         }
         QueryParser parser = new QueryParser(field, analyzer);
+        long ctr = 0;
+        long duration = 0;
         while (true) {
             if (queries == null && queryString == null) {                        // prompt the user
                 System.out.println("Enter query: ");
@@ -102,15 +104,19 @@ public class SearchFiles {
             }
 
             Query query = parser.parse(line);
+
             System.out.println("Searching for: " + query.toString(field));
 
             if (repeat > 0) {                           // repeat & time as benchmark
                 Date start = new Date();
                 for (int i = 0; i < repeat; i++) {
                     searcher.search(query, 100);
+                    ctr++;
                 }
                 Date end = new Date();
                 System.out.println("Time: " + (end.getTime() - start.getTime()) + "ms");
+                duration += end.getTime() - start.getTime();
+
             }
 
             doPagingSearch(in, searcher, query, hitsPerPage, raw, queries == null && queryString == null);
@@ -120,6 +126,8 @@ public class SearchFiles {
             }
         }
         reader.close();
+        System.out.println("\nAverage query time (ms) "+(duration*1.0)/ctr);
+        System.out.println("Total no of queries "+ctr);
     }
 
     /**
@@ -138,7 +146,7 @@ public class SearchFiles {
         TopDocs results = searcher.search(query, 5 * hitsPerPage);
         ScoreDoc[] hits = results.scoreDocs;
 
-        int numTotalHits = (int) results.totalHits;
+        int numTotalHits = Math.toIntExact(results.totalHits);
         System.out.println(numTotalHits + " total matching documents");
 
         int start = 0;

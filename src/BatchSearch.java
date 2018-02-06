@@ -120,10 +120,10 @@ public class BatchSearch {
         TopDocs results = searcher.search(query, 1000);
         ScoreDoc[] hits = results.scoreDocs;
         HashMap<String, String> seen = new HashMap<>(1000);
-        long numTotalHits = results.totalHits;
+        int numTotalHits = Math.toIntExact(results.totalHits);
 
         int start = 0;
-        long end = Math.min(numTotalHits, 1000);
+        int end = Math.min(numTotalHits, 1000);
 
         for (int i = start; i < end; i++) {
             Document doc = searcher.doc(hits[i].doc);

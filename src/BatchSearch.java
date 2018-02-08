@@ -1,12 +1,4 @@
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.file.Paths;
-import java.util.HashMap;
-
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
@@ -17,6 +9,13 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.similarities.*;
 import org.apache.lucene.store.FSDirectory;
+
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.file.Paths;
+import java.util.HashMap;
 
 /**
  * Simple command-line based search demo.
@@ -81,7 +80,7 @@ public class BatchSearch {
         IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(index)));
         IndexSearcher searcher = new IndexSearcher(reader);
         searcher.setSimilarity(simfn);
-        Analyzer analyzer = new StandardAnalyzer();
+        Analyzer analyzer = new ImprovedAnalyzier();
 
         BufferedReader in;
         if (queries != null) {

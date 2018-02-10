@@ -1,7 +1,16 @@
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -9,13 +18,6 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.similarities.*;
 import org.apache.lucene.store.FSDirectory;
-
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.file.Paths;
-import java.util.HashMap;
 
 /**
  * Simple command-line based search demo.
@@ -88,7 +90,10 @@ public class BatchSearch {
         } else {
             in = new BufferedReader(new InputStreamReader(new FileInputStream("queries"), "UTF-8"));
         }
-        QueryParser parser = new QueryParser(field, analyzer);
+        Map<String,Float> boost = new HashMap<>();
+        boost.put("headline",2.0f);
+        boost.put(field,1.0f);
+        QueryParser parser = new MultiFieldQueryParser(new String[]{"headline",field}, analyzer,boost);
         while (true) {
             String line = in.readLine();
 

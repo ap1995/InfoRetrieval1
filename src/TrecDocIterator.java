@@ -34,6 +34,8 @@ public class TrecDocIterator implements Iterator<Document> {
         try {
             String line;
             Pattern docno_tag = Pattern.compile("<DOCNO>\\s*(\\S+)\\s*<");
+            Pattern headline_start_tag = Pattern.compile("<HEADLINE>\\s*");
+            Pattern headline_end_tag = Pattern.compile("</HEADLINE>\\s*");
             boolean in_doc = false;
             while (true) {
                 line = rdr.readLine();
@@ -57,6 +59,26 @@ public class TrecDocIterator implements Iterator<Document> {
                 if (m.find()) {
                     String docno = m.group(1);
                     doc.add(new StringField("docno", docno, Field.Store.YES));
+                }
+                m = headline_start_tag.matcher(line);
+                if(m.find()){
+                    StringBuffer headline = new StringBuffer();
+                    line = rdr.readLine();
+                    while(true) {
+                        m = headline_end_tag.matcher(line);
+                        if(!m.find()) {
+                            headline.append(line);
+                            line = rdr.readLine();
+                        } else {
+                            break;
+                        }
+                    }
+
+                    if(headline.length() > 20) {
+                        Field headlineField = new TextField("headline", headline.substring(16), Field.Store.NO);
+                        doc.add(headlineField);
+                        sb.append("<HEADLINE>" + headline.toString() + "</HEADLINE>");
+                    }
                 }
 
                 sb.append(line);

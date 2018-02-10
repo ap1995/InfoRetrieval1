@@ -94,6 +94,7 @@ public class BatchSearch {
         boost.put("headline",2.0f);
         boost.put(field,1.0f);
         QueryParser parser = new MultiFieldQueryParser(new String[]{"headline",field}, analyzer,boost);
+        parser.setDefaultOperator(QueryParser.Operator.AND);
         while (true) {
             String line = in.readLine();
 
